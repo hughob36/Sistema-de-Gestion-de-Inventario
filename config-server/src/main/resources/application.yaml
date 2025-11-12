@@ -7,5 +7,5 @@ spring:
     config:
       server:
         git:
-          uri: 
+          uri:
           search-paths: config-data
