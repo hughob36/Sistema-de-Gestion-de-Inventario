@@ -24,7 +24,7 @@ public class JwtUtil {
     @Value("${security.jwt.user.generator}")
     private String userGenerator;
 
-    private String createToken(Authentication authentication) {
+    public String createToken(Authentication authentication) {
 
         Algorithm algorithm = Algorithm.HMAC256(privateKey);
         String username = authentication.getPrincipal().toString();
@@ -42,7 +42,7 @@ public class JwtUtil {
                 .sign(algorithm);
     }
 
-    private DecodedJWT validateToken(String token) {
+    public DecodedJWT validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(privateKey);
 
@@ -56,11 +56,11 @@ public class JwtUtil {
         }
     }
 
-    private String getUsername(DecodedJWT decodedJWT) {
+    public String getUsername(DecodedJWT decodedJWT) {
         return decodedJWT.getSubject().toString();
     }
 
-    private Claim getEspecificClaim(DecodedJWT decodedJWT, String claimName) {
+    public Claim getEspecificClaim(DecodedJWT decodedJWT, String claimName) {
         return decodedJWT.getClaim(claimName);
     }
 

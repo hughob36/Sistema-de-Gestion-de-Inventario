@@ -4,7 +4,7 @@ import com.auth.service.auth_service.exception.ResourceNotFoundException;
 import com.auth.service.auth_service.model.Role;
 import com.auth.service.auth_service.model.UserApp;
 import com.auth.service.auth_service.repository.IRoleRepository;
-import com.auth.service.auth_service.repository.IUserAppRespository;
+import com.auth.service.auth_service.repository.IUserAppRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +16,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class UserService implements IUserAppService {
 
-    private final IUserAppRespository userAppRepository;
+    private final IUserAppRepository userAppRepository;
     private final IRoleRepository roleRepository;
 
     @Override
