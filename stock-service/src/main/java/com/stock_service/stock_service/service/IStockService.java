@@ -8,8 +8,8 @@ import java.util.List;
 
 public interface IStockService {
 
-    public List<StockRequestDTO> findAll();
-    public StockRequestDTO findById(Long id);
+    public List<StockResponseDTO> findAll();
+    public StockResponseDTO findById(Long id);
     public StockResponseDTO save(StockRequestDTO stockRequestDTO);
     public void deleteById(Long id);
     public StockResponseDTO updateById(Long id, StockRequestDTO stockRequestDTO);
