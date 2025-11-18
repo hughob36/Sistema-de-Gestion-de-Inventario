@@ -7,5 +7,7 @@ spring:
     config:
       server:
         git:
-          uri: https://github.com/hughob36/Sistema-de-Gesti-n-de-Inventario.git
+          uri: https://github.com/hughob36/Sistema-de-Gestion-de-Inventario.git
           search-paths: config-data
+          username: ${GIT_USER}
+          password: ${GIT_TOKEN}
