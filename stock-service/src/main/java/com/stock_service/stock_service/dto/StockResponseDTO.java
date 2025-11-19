@@ -16,6 +16,5 @@ public class StockResponseDTO {
     private Integer quantity;
     private String warehouse;
     private String status;
-    private Integer reservedQuantity;
     private LocalDateTime lastUpdate;
 }

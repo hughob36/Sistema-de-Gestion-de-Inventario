@@ -13,4 +13,6 @@ public interface IStockService {
     public StockResponseDTO save(StockRequestDTO stockRequestDTO);
     public void deleteById(Long id);
     public StockResponseDTO updateById(Long id, StockRequestDTO stockRequestDTO);
+
+    public StockResponseDTO findByProductId(Long id);
 }

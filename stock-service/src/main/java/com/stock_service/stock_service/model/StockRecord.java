@@ -16,7 +16,7 @@ public class StockRecord {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "product_id", nullable = false)
+    @Column(unique = true ,nullable = false)
     private Long productId; // Referencia al producto (no FK física)
 
     @Column(nullable = false)

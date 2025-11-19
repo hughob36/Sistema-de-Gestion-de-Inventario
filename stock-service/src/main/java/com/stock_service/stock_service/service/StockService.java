@@ -38,11 +38,24 @@ public class StockService implements IStockService{
 
     @Override
     public void deleteById(Long id) {
-
+        if(!stockRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Resource not found.");
+        }
+        stockRepository.deleteById(id);
     }
 
     @Override
     public StockResponseDTO updateById(Long id, StockRequestDTO stockRequestDTO) {
-        return null;
+        StockRecord stockRecordFound = stockRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Resource not found." ));
+        stockMapper.updateStockFromDto(stockRequestDTO,stockRecordFound);
+        return stockMapper.toStockResponseDTO(stockRepository.save(stockRecordFound));
+    }
+
+    @Override
+    public StockResponseDTO findByProductId(Long id) {
+        StockRecord stockRecordFound = stockRepository.findByProductId(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Product id not found."));
+        return stockMapper.toStockResponseDTO(stockRecordFound);
     }
 }
