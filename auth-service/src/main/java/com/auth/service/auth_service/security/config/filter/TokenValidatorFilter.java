@@ -1,6 +1,5 @@
 package com.auth.service.auth_service.security.config.filter;
 
-
 import com.auth.service.auth_service.utils.JwtUtil;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import jakarta.servlet.FilterChain;

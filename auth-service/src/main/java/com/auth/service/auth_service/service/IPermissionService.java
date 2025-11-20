@@ -1,13 +1,14 @@
 package com.auth.service.auth_service.service;
 
 
+import com.auth.service.auth_service.dto.PermissionResponseDTO;
 import com.auth.service.auth_service.model.Permission;
 
 import java.util.List;
 
 public interface IPermissionService {
 
-    public List<Permission> findAll();
+    public List<PermissionResponseDTO> findAll();
     public Permission findBYId(Long id);
     public Permission save(Permission permission);
     public void deleteById(Long id);

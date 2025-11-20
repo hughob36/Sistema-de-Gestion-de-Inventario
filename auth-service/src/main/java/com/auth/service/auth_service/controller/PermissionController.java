@@ -1,10 +1,13 @@
 package com.auth.service.auth_service.controller;
 
+import com.auth.service.auth_service.dto.PermissionResponseDTO;
 import com.auth.service.auth_service.model.Permission;
 import com.auth.service.auth_service.service.IPermissionService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,12 +15,14 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/permission")
 @RequiredArgsConstructor
+//@PreAuthorize("denyAll()")
 public class PermissionController {
 
     private final IPermissionService  permissionService;
 
     @GetMapping
-    public ResponseEntity<List<Permission>> getAllPermission() {
+    //@PreAuthorize("hasAuthority('CREATE')")
+    public ResponseEntity<List<PermissionResponseDTO>> getAllPermission() {
         return ResponseEntity.ok(permissionService.findAll());
     }
 
@@ -27,7 +32,7 @@ public class PermissionController {
     }
 
     @PostMapping
-    public ResponseEntity<Permission> createPermission(@RequestBody Permission permission) {
+    public ResponseEntity<Permission> createPermission(@RequestBody @Valid Permission permission) {
         return ResponseEntity.status(HttpStatus.CREATED)
                 .body(permissionService.save(permission));
     }

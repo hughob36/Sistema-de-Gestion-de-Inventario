@@ -1,6 +1,8 @@
 package com.auth.service.auth_service.service;
 
+import com.auth.service.auth_service.dto.PermissionResponseDTO;
 import com.auth.service.auth_service.exception.ResourceNotFoundException;
+import com.auth.service.auth_service.mapper.IPermissionMapper;
 import com.auth.service.auth_service.model.Permission;
 import com.auth.service.auth_service.repository.IPermissionRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,12 +15,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class PermissionService implements IPermissionService{
 
-    @Autowired
+
     private final IPermissionRepository permissionRepository;
+    private final IPermissionMapper permissionMapper;
 
     @Override
-    public List<Permission> findAll() {
-        return permissionRepository.findAll();
+    public List<PermissionResponseDTO> findAll() {
+        return permissionMapper.toPermissionResponseDTO(permissionRepository.findAll());
     }
 
     @Override
