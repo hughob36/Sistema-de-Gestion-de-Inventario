@@ -43,6 +43,6 @@ public class UserAppController {
 
     @PutMapping("/{id}")
     public ResponseEntity<UserAppResponseDTO> updateUserById(@PathVariable Long id, @RequestBody @Valid UserAppRequestDTO userAppRequestDTO) {
-        return ResponseEntity.ok(userAppService.save(userAppRequestDTO));
+        return ResponseEntity.ok(userAppService.updateById(id,userAppRequestDTO));
     }
 }
