@@ -13,6 +13,6 @@ import lombok.Setter;
 public class PermissionRequestDTO {
 
     @NotBlank(message = "Permission cannot be empty.")
-    @Size(min = 2, max = 40, message = "Permission must be between 3 and 50 characters.")
+    @Size(min = 2, max = 40, message = "Permission must be between 2 and 40 characters.")
     private String permissionName;
 }

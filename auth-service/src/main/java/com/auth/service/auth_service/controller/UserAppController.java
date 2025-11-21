@@ -1,7 +1,10 @@
 package com.auth.service.auth_service.controller;
 
+import com.auth.service.auth_service.dto.UserAppRequestDTO;
+import com.auth.service.auth_service.dto.UserAppResponseDTO;
 import com.auth.service.auth_service.model.UserApp;
 import com.auth.service.auth_service.service.IUserAppService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,19 +20,19 @@ public class UserAppController {
     private final IUserAppService userAppService;
 
     @GetMapping
-    public ResponseEntity<List<UserApp>> getUsers() {
+    public ResponseEntity<List<UserAppResponseDTO>> getUsers() {
         return ResponseEntity.ok(userAppService.findAll());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserApp> getUserById(@PathVariable Long id) {
+    public ResponseEntity<UserAppResponseDTO> getUserById(@PathVariable Long id) {
         return ResponseEntity.ok( userAppService.findById(id));
     }
 
     @PostMapping
-    public ResponseEntity<UserApp> createUser(@RequestBody UserApp userApp) {
+    public ResponseEntity<UserAppResponseDTO> createUser(@RequestBody @Valid UserAppRequestDTO userAppRequestDTO) {
         return ResponseEntity.status(HttpStatus.CREATED)
-                .body(userAppService.save(userApp));
+                .body(userAppService.save(userAppRequestDTO));
     }
 
     @DeleteMapping("/{id}")
@@ -39,7 +42,7 @@ public class UserAppController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<UserApp> updateUserById(@PathVariable Long id, @RequestBody UserApp userApp) {
-        return ResponseEntity.ok(userAppService.save(userApp));
+    public ResponseEntity<UserAppResponseDTO> updateUserById(@PathVariable Long id, @RequestBody @Valid UserAppRequestDTO userAppRequestDTO) {
+        return ResponseEntity.ok(userAppService.save(userAppRequestDTO));
     }
 }

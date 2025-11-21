@@ -1,6 +1,9 @@
 package com.auth.service.auth_service.service;
 
+import com.auth.service.auth_service.dto.UserAppRequestDTO;
+import com.auth.service.auth_service.dto.UserAppResponseDTO;
 import com.auth.service.auth_service.exception.ResourceNotFoundException;
+import com.auth.service.auth_service.mapper.IUserMapper;
 import com.auth.service.auth_service.model.Role;
 import com.auth.service.auth_service.model.UserApp;
 import com.auth.service.auth_service.repository.IRoleRepository;
@@ -19,24 +22,27 @@ public class UserService implements IUserAppService {
 
     private final IUserAppRepository userAppRepository;
     private final IRoleRepository roleRepository;
+    private final IUserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
 
     @Override
-    public List<UserApp> findAll() {
-        return userAppRepository.findAll();
+    public List<UserAppResponseDTO> findAll() {
+        return userMapper.toUserAppResponseDTOList(userAppRepository.findAll());
     }
 
     @Override
-    public UserApp findById(Long id) {
-        return userAppRepository.findById(id)
+    public UserAppResponseDTO findById(Long id) {
+        UserApp userAppFound = userAppRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found."));
+        return userMapper.toUserAppResponseDTO(userAppFound);
     }
 
     @Override
-    public UserApp save(UserApp userApp) {
+    public UserAppResponseDTO save(UserAppRequestDTO userAppRequestDTO) {
+        UserApp userApp = userMapper.toUserApp(userAppRequestDTO);
         UserApp userAppValidate = this.validateRoleExists(userApp);
         userAppValidate.setPassword(passwordEncoder.encode(userAppValidate.getPassword()));
-        return userAppRepository.save(userAppValidate);
+        return userMapper.toUserAppResponseDTO(userAppRepository.save(userAppValidate));
     }
 
     @Override
@@ -48,12 +54,16 @@ public class UserService implements IUserAppService {
     }
 
     @Override
-    public UserApp updateById(Long id, UserApp userApp) {
+    public UserAppResponseDTO updateById(Long id, UserAppRequestDTO userAppRequestDTO) {
+        UserApp userAppFound = userAppRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found."));
 
-        UserApp userAppFound = this.findById(id);
+        userMapper.updateUserFromDTO(userAppRequestDTO,userAppFound);
+
         UserApp userAppValidate = this.validateRoleExists(userAppFound);
         userAppValidate.setPassword(passwordEncoder.encode(userAppValidate.getPassword()));
-        return userAppRepository.save(userAppValidate);
+
+        return userMapper.toUserAppResponseDTO(userAppRepository.save(userAppValidate));
     }
 
     public UserApp validateRoleExists(UserApp userApp) {
