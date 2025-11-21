@@ -53,7 +53,7 @@ public class GlobalHandlerException {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-        // Podés usar tu ErrorResponseDTO para devolver un mensaje general + lista de errores
+        // ErrorResponseDTO para devolver un mensaje general + lista de errores
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Validation failed", errors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
