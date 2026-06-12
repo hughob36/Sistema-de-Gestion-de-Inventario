@@ -32,6 +32,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
+                .authorizeHttpRequests(auth -> auth
+                        // 1. PERMITIR ACCESO PÚBLICO A SWAGGER EN EL MICROSERVICIO
+                        .requestMatchers("/api-docs-json", "/v3/api-docs/**").permitAll()
+
+                        // 2. Tus otras rutas públicas (Login, Registro, etc.)
+                        .requestMatchers("/api/v1/auth/**").permitAll()
+
+                        // Cualquier otra petición requiere autenticación
+                        .anyRequest().authenticated()
+                )
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(new TokenValidatorFilter(jwtUtil),BasicAuthenticationFilter.class)
