@@ -4,11 +4,13 @@ server:
 spring:
   cloud:
     gateway:
-      # Filtro que elimina el primer segmento de la URL
+      # CAMBIO AQUÍ: Sintaxis expandida para asegurar el funcionamiento del filtro
       default-filters:
-        - RewritePath=^/.*?/(?<remaining>.*)$, /${remaining}
+        - name: RewritePath
+          args:
+            regexp: '^/.*?/(?<remaining>.*)$'
+            replacement: '/${remaining}'
       
-      # AQUÍ EL CAMBIO NUEVO: Usando la estructura moderna recomendada por el log
       server:
         webflux:
           discovery:
