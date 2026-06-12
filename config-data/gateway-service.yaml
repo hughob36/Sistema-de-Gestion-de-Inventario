@@ -20,6 +20,8 @@ spring:
 
 springdoc:
   swagger-ui:
+    use-root-path: true # Ayuda a resolver problemas de rutas en Gateways
+    path: /swagger-ui.html
     urls:
       - name: auth-service
         url: /api/v1/auth-service/v3/api-docs
