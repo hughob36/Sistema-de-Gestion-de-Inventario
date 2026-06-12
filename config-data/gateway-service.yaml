@@ -22,8 +22,8 @@ springdoc:
     path: /swagger-ui.html
     urls:
       - name: auth-service
-        url: /auth-service/v3/api-docs
+        url: /auth-service/api-docs-json
       - name: product-service
-        url: /product-service/v3/api-docs
+        url: /product-service/api-docs-json
       - name: stock-service
-        url: /stock-service/v3/api-docs
+        url: /stock-service/api-docs-json
