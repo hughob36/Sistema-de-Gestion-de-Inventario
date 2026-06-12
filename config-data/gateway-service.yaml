@@ -1,14 +1,20 @@
 server:
   port: 443
-  
+
 spring:
   cloud:
-    gateway:      
-      discovery:
-        locator:
-          enabled: true 
-          lower-case-service-id: true 
-      # Eliminé "server: webflux:" que estaba mal indentado arriba, discovery va directo bajo gateway.
+    gateway:
+      # Filtro que elimina el primer segmento de la URL
+      default-filters:
+        - RewritePath=^/.*?/(?<remaining>.*)$, /${remaining}
+      
+      # AQUÍ EL CAMBIO NUEVO: Usando la estructura moderna recomendada por el log
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
 
 springdoc:
   swagger-ui:
