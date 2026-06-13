@@ -33,12 +33,7 @@ public class SecurityConfig {
         return httpSecurity
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        // PERMITIR ACCESO PÚBLICO COMPLETO A SWAGGER (Cualquier variante)
-                        .requestMatchers("/api-docs-json", "/v3/api-docs/**", "/**/v3/api-docs", "/**/api-docs-json").permitAll()
-
-                        // Tus otras rutas públicas
-                        .requestMatchers("/api/v1/auth/**").permitAll()
-
+                        .requestMatchers("/v3/api-docs/**").permitAll()
                         // Cualquier otra petición requiere autenticación
                         .anyRequest().authenticated()
                 )

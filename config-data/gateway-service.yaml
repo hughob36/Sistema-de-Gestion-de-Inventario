@@ -4,13 +4,30 @@ server:
 spring:
   cloud:
     gateway:
-      # CAMBIO AQUÍ: Sintaxis expandida para asegurar el funcionamiento del filtro
-      default-filters:
-        - name: RewritePath
-          args:
-            regexp: '^/.*?/(?<remaining>.*)$'
-            replacement: '/${remaining}'
-      
+      # 1. Definimos rutas explícitas para el negocio y para Swagger
+      routes:
+        # --- RUTAS PARA SWAGGER (Mantiene la ruta limpia hacia el microservicio) ---
+        - id: auth-swagger
+          uri: lb://auth-service
+          predicates:
+            - Path=/auth-service/v3/api-docs
+            
+        - id: product-swagger
+          uri: lb://product-service
+          predicates:
+            - Path=/product-service/v3/api-docs
+
+        # --- RUTAS NORMALES DE TU NEGOCIO (Usan tu filtro de reescritura) ---
+        - id: auth-service-api
+          uri: lb://auth-service
+          predicates:
+            - Path=/api/v1/auth-service/**
+          filters:
+            - name: RewritePath
+              args:
+                regexp: '^/.*?/.*?/(?<remaining>.*)$'
+                replacement: '/${remaining}'
+
       server:
         webflux:
           discovery:
@@ -18,14 +35,15 @@ spring:
               enabled: true
               lower-case-service-id: true
 
+# 2. Configuración de la interfaz gráfica de Swagger en el Gateway
 springdoc:
   swagger-ui:
     use-root-path: true
     path: /swagger-ui.html
     urls:
       - name: auth-service
-        url: /auth-service/api-docs-json
+        url: /auth-service/v3/api-docs
       - name: product-service
-        url: /product-service/api-docs-json
+        url: /product-service/v3/api-docs
       - name: stock-service
-        url: /stock-service/api-docs-json
+        url: /stock-service/v3/api-docs  
