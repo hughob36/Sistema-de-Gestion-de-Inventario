@@ -48,4 +48,11 @@ public class TokenValidatorFilter extends OncePerRequestFilter {
         filterChain.doFilter(request,response);
     }
 
+    @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getRequestURI();
+        // Si la petición va hacia Swagger o OpenAPI, el filtro NO se ejecuta
+        return path.startsWith("/v3/api-docs") || path.startsWith("/swagger-ui");
+    }
+
 }
