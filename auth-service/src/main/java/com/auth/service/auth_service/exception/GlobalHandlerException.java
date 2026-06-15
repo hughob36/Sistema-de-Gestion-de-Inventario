@@ -41,10 +41,18 @@ public class GlobalHandlerException {
     }
 
 
-    @ExceptionHandler(Exception.class)
+    /*@ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("An unexpected error occurred on the server.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }*/
+
+    @ExceptionHandler(Exception.class)  // ← Este captura TODO
+    public ResponseEntity<?> handleException(Exception ex) {
+        return ResponseEntity.status(500).body(Map.of(
+                "message", "An unexpected error occurred on the server.",
+                "details", null
+        ));
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
