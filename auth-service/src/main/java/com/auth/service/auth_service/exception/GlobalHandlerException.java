@@ -47,12 +47,12 @@ public class GlobalHandlerException {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }*/
 
-    @ExceptionHandler(Exception.class)  // ← Este captura TODO
+    @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
-        return ResponseEntity.status(500).body(Map.of(
-                "message", "An unexpected error occurred on the server.",
-                "details", null
-        ));
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "An unexpected error occurred on the server.");
+        body.put("details", ex.getMessage()); // o null si querés ocultarlo
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
