@@ -1,6 +1,7 @@
 package com.auth.service.auth_service.exception;
 
 import com.auth.service.auth_service.dto.ErrorResponseDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 @RestControllerAdvice
+@Slf4j
 public class GlobalHandlerException {
 
     @ExceptionHandler(ResourceNotFoundException.class)
@@ -45,13 +47,22 @@ public class GlobalHandlerException {
     public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("An unexpected error occurred on the server.");
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }*/
+    }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
         Map<String, Object> body = new HashMap<>();
         body.put("message", "An unexpected error occurred on the server.");
         body.put("details", ex.getMessage()); // o null si querés ocultarlo
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }*/
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<?> handleException(Exception ex) {
+        log.error("Unexpected error: ", ex); // loggear el stacktrace completo
+        Map<String, Object> body = new HashMap<>();
+        body.put("message", "An unexpected error occurred on the server.");
+        body.put("details", null); // nunca exponer detalles internos al cliente
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
