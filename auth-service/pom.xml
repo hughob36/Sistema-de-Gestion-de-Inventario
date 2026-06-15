@@ -98,11 +98,6 @@
 			<artifactId>mapstruct</artifactId>
 			<version>${org.mapstruct.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>org.springdoc</groupId>
-			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
-			<version>2.5.0</version>
-		</dependency>
 		<!-- Reemplazá la versión en auth-service -->
 		<dependency>
 			<groupId>org.springdoc</groupId>
@@ -118,7 +113,7 @@
 				<version>${spring-cloud.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
-			</dependency>a
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
