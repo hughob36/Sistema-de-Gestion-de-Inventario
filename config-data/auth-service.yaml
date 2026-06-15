@@ -30,3 +30,9 @@ springdoc:
   api-docs:
     path: /v3/api-docs
     resolve-schema-properties: true
+
+logging:
+  level:
+    org.springframework.web: DEBUG
+    org.springframework.security: DEBUG
+    org.springdoc: DEBUG
