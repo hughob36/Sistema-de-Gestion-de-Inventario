@@ -16,8 +16,10 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -36,12 +38,33 @@ public class PermissionControllerIntTest {
     private ObjectMapper objectMapper;
 
 
-
     @BeforeEach
     void cleanDatabase() {
         /*userAppRepository.deleteAll();
         roleRepository.deleteAll();*/
         permissionRepository.deleteAll();
+    }
+
+    @Test
+    @DisplayName("GET /api/permission - Should return all permissions for ADMIN")
+    @WithMockUser(roles = {"ADMIN"})
+    public void getAllPermissions_Success() throws Exception {
+
+        Permission p1 = new Permission();
+        p1.setPermissionName("CREATE");
+        Permission p2 = new Permission();
+        p2.setPermissionName("UPDATE");
+        permissionRepository.saveAll(List.of(p1, p2));
+
+        // 2. Act & Assert
+        mockMvc.perform(get("/api/permission")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk())
+                .andExpect(result -> {
+                    String json = result.getResponse().getContentAsString();
+                    assertThat(json).contains("CREATE");
+                    assertThat(json).contains("UPDATE");
+                });
     }
 
     @Test
