@@ -40,8 +40,6 @@ public class PermissionControllerIntTest {
 
     @BeforeEach
     void cleanDatabase() {
-        /*userAppRepository.deleteAll();
-        roleRepository.deleteAll();*/
         permissionRepository.deleteAll();
     }
 

@@ -59,4 +59,28 @@ public class PermissionServiceTest {
         verify(permissionMapper, times(1)).toPermissionResponseDTOList(anyList());
         verifyNoMoreInteractions(permissionRepository, permissionMapper);
     }
+
+    @Test
+    @DisplayName("Should return an empty list when no permissions exist in the database")
+    public void findAll_ShouldReturnEmptyPermissionResponseDTOList() {
+        // Arrange
+        List<Permission> emptyPermissionList = List.of();
+        List<PermissionResponseDTO> emptyResponseDTOList = List.of();
+
+        when(permissionRepository.findAll()).thenReturn(emptyPermissionList);
+        when(permissionMapper.toPermissionResponseDTOList(emptyPermissionList)).thenReturn(emptyResponseDTOList);
+        // Act
+        List<PermissionResponseDTO> result = permissionService.findAll();
+        // Assert
+        assertAll("Verify empty response properties",
+                () -> assertNotNull(result, "The result should not be null even if empty"),
+                () -> assertTrue(result.isEmpty(), "The list should be empty"),
+                () -> assertEquals(0, result.size(), "The size of the list should be 0")
+        );
+        verify(permissionRepository, times(1)).findAll();
+        verify(permissionMapper, times(1)).toPermissionResponseDTOList(emptyPermissionList);
+    }
+
+
+
 }
