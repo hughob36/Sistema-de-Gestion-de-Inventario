@@ -26,7 +26,7 @@ public class PermissionService implements IPermissionService{
     }
 
     @Override
-    public PermissionResponseDTO findBYId(Long id) {
+    public PermissionResponseDTO findById(Long id) {
         Permission permission = permissionRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
         return permissionMapper.toPermissionResponseDTO(permission);

@@ -13,6 +13,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.List;
+import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -79,6 +80,28 @@ public class PermissionServiceTest {
         );
         verify(permissionRepository, times(1)).findAll();
         verify(permissionMapper, times(1)).toPermissionResponseDTOList(emptyPermissionList);
+    }
+
+    @Test
+    @DisplayName("Should return a PermissionResponseDTO when findById is called")
+    public void findByID_ShouldReturnPermissionResponseDTO() {
+        Long id = 1L;
+        Permission permission = new Permission(id,"CREATE");
+        PermissionResponseDTO permissionResponseDTO = new PermissionResponseDTO(id,"CREATE");
+
+        when(permissionRepository.findById(id)).thenReturn(Optional.of(permission));
+        when(permissionMapper.toPermissionResponseDTO(permission)).thenReturn(permissionResponseDTO);
+
+        PermissionResponseDTO result = permissionService.findById(id);
+
+        assertAll("Verify response properties",
+                () -> assertNotNull(result, "The result should not be null"),
+                () -> assertEquals("CREATE", result.getPermissionName(), "The permission name does not match"),
+                () -> assertEquals(id, result.getId(), "The ID does not match")
+        );
+        verify(permissionRepository, times(1)).findById(id);
+        verify(permissionMapper, times(1)).toPermissionResponseDTO(any());
+        verifyNoMoreInteractions(permissionRepository, permissionMapper);
     }
 
 

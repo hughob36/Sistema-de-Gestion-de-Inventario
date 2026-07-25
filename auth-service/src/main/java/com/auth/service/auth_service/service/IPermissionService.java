@@ -10,7 +10,7 @@ import java.util.List;
 public interface IPermissionService {
 
     public List<PermissionResponseDTO> findAll();
-    public PermissionResponseDTO findBYId(Long id);
+    public PermissionResponseDTO findById(Long id);
     public PermissionResponseDTO save(PermissionRequestDTO permissionRequestDTO);
     public void deleteById(Long id);
     public PermissionResponseDTO updateById(Long id, PermissionRequestDTO permissionRequestDTO);

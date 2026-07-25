@@ -29,7 +29,7 @@ public class PermissionController {
 
     @GetMapping("/{id}")
     public ResponseEntity<PermissionResponseDTO> getPermissionFindById(@PathVariable Long id) {
-        return ResponseEntity.ok(permissionService.findBYId(id));
+        return ResponseEntity.ok(permissionService.findById(id));
     }
 
     @PostMapping
