@@ -2,6 +2,7 @@ package com.auth.service.auth_service.service;
 
 
 import com.auth.service.auth_service.dto.PermissionResponseDTO;
+import com.auth.service.auth_service.exception.ResourceNotFoundException;
 import com.auth.service.auth_service.mapper.IPermissionMapper;
 import com.auth.service.auth_service.model.Permission;
 import com.auth.service.auth_service.repository.IPermissionRepository;
@@ -102,6 +103,22 @@ public class PermissionServiceTest {
         verify(permissionRepository, times(1)).findById(id);
         verify(permissionMapper, times(1)).toPermissionResponseDTO(any());
         verifyNoMoreInteractions(permissionRepository, permissionMapper);
+    }
+
+    @Test
+    @DisplayName("Should throw ResourceNotFoundException when ID does not exist")
+    public void findById_ShouldThrowResourceNotFoundException_WhenIdDoesNotExist() {
+        // Arrange
+        Long id = 1L;
+        when(permissionRepository.findById(id)).thenReturn(Optional.empty());
+        // Act & Assert
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class, () -> {
+            permissionService.findById(id);
+        });
+
+        assertEquals("Id '1' not found.", exception.getMessage());
+        verify(permissionRepository, times(1)).findById(id);
+        verifyNoInteractions(permissionMapper);
     }
 
 
