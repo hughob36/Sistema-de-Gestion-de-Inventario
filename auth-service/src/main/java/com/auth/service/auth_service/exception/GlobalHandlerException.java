@@ -62,7 +62,8 @@ public class GlobalHandlerException {
         log.error("Unexpected error: ", ex); // loggear el stacktrace completo
         Map<String, Object> body = new HashMap<>();
         body.put("message", "An unexpected error occurred on the server.");
-        body.put("details", null); // nunca exponer detalles internos al cliente
+        //body.put("details", ex.getMessage()); // nunca exponer detalles internos al cliente
+        body.put("details", null);
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
