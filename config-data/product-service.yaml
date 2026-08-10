@@ -15,6 +15,10 @@ security:
     user:
       generator: ${USER_GENERATOR}
 spring:
+  cloud:
+    openfeign:
+      circuitbreaker:
+        enabled: true
   application:
     name: product-service
   datasource:
