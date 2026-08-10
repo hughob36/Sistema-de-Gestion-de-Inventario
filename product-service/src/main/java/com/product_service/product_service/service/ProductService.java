@@ -29,6 +29,8 @@ public class ProductService implements IProductService{
 
         List<Product> products = productRepository.findAll();
         List<ProductResponseDTO> productDTOs = productMapper.toProductResponseDTOList(products);
+
+        // Si stock-service falla, esto devuelve [] por el fallback
         List<StockResponseDTO> stockList = stockClient.findAll();
 
         // Convertir stock list → mapa para buscar rápido
