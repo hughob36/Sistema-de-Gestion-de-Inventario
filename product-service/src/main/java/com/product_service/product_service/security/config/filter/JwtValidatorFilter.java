@@ -1,7 +1,6 @@
 package com.product_service.product_service.security.config.filter;
 
 import com.auth0.jwt.interfaces.DecodedJWT;
-import com.product_service.product_service.security.config.SecurityConfig;
 import com.product_service.product_service.utils.JwtUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;

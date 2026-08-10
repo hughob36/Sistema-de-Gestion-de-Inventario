@@ -45,7 +45,7 @@ public class ProductService implements IProductService{
                 dto.setStatus(stock.getStatus());
             } else {
                 dto.setStock(0);
-                dto.setStatus("UNAVAILABLE");
+                dto.setStatus("OUT_OF_STOCK");
             }
         }
         return productDTOs;
@@ -55,7 +55,16 @@ public class ProductService implements IProductService{
     public ProductResponseDTO findById(Long id) {
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
-        return productMapper.toProductResponseDTO(product);
+
+        StockResponseDTO stock = stockClient.findByProductId(product.getProductId())
+                .orElseThrow(() -> new ResourceNotFoundException("Resource stock not found."));
+
+        ProductResponseDTO productResponseDTO = productMapper.toProductResponseDTO(product);
+
+        productResponseDTO.setStock(stock.getQuantity());
+        productResponseDTO.setStatus(stock.getStatus());
+
+        return productResponseDTO;
     }
 
     @Override
@@ -78,6 +87,7 @@ public class ProductService implements IProductService{
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
 
         productMapper.updateProductFromDto(productRequestDTO,product);
-        return productMapper.toProductResponseDTO(productRepository.save(product));
+        Product saveProduct = productRepository.save(product);
+        return productMapper.toProductResponseDTO(saveProduct);
     }
 }
