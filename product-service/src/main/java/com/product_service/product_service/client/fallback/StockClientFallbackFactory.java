@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 @Component
 public class StockClientFallbackFactory implements FallbackFactory<IStockClient> {
@@ -23,10 +22,10 @@ public class StockClientFallbackFactory implements FallbackFactory<IStockClient>
             }
 
             @Override
-            public Optional<StockResponseDTO> findByProductId(Long productId) {
-                // En caso de error, retornamos Optional vacío
-                return Optional.empty();
+            public StockResponseDTO findByProductId(Long productId) {
+                return null;
             }
+
         };
     }
 }

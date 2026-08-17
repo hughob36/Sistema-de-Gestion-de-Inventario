@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -58,14 +59,17 @@ public class ProductService implements IProductService{
         Product product = productRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
 
-        StockResponseDTO stock = stockClient.findByProductId(product.getProductId())
-                .orElseThrow(() -> new ResourceNotFoundException("Resource stock not found."));
+        StockResponseDTO stock = stockClient.findByProductId(product.getProductId());
 
         ProductResponseDTO productResponseDTO = productMapper.toProductResponseDTO(product);
 
-        productResponseDTO.setStock(stock.getQuantity());
-        productResponseDTO.setStatus(stock.getStatus());
-
+        if(stock != null) {
+            productResponseDTO.setStock(stock.getQuantity());
+            productResponseDTO.setStatus(stock.getStatus());
+        } else {
+            productResponseDTO.setStock(0);
+            productResponseDTO.setStatus("STOCK_UNAVAILABLE");
+        }
         return productResponseDTO;
     }
 

@@ -17,5 +17,5 @@ public interface IStockClient {
     public List<StockResponseDTO> findAll();
 
     @GetMapping("/stock/product/{productId}")
-    public Optional<StockResponseDTO> findByProductId(@PathVariable Long productId);
+    public StockResponseDTO findByProductId(@PathVariable Long productId);
 }
