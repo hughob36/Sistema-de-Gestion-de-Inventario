@@ -22,7 +22,7 @@ public class ProductResponseDTO {
     private String category;
     private Boolean active;
 
-    // Información de stock (viene del stock-check-service)
+    // Información de stock
     private Integer stock;
     private String status; // "AVAILABLE","OUT_OF_STOCK"
 
