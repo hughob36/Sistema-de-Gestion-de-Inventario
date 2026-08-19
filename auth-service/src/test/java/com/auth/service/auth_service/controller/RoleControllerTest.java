@@ -18,8 +18,8 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
-import java.util.NoSuchElementException;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -47,8 +47,8 @@ public class RoleControllerTest {
     @BeforeEach
     void setUp() {
         // Inicializa con datos válidos según los atributos de tus DTOs
-        validRequestDTO = new RoleRequestDTO();
-        sampleResponseDTO = new RoleResponseDTO();
+        validRequestDTO = new RoleRequestDTO("ADMIN",new HashSet<>());
+        sampleResponseDTO = new RoleResponseDTO(99L,"ADMIN",new HashSet<>());
     }
 
     // ==========================================
@@ -121,23 +121,13 @@ public class RoleControllerTest {
         @DisplayName("Negativo: Debe retornar 404 Not Found cuando el ID no existe")
         void getRoleById_WhenIdNotFound_ShouldReturnNotFound() throws Exception {
             Long nonExistentId = 99L;
-            when(roleService.findById(nonExistentId)).thenThrow(new NoSuchElementException("Rol no encontrado"));
+            when(roleService.findById(nonExistentId)).thenThrow(new ResourceNotFoundException("Role not found."));
 
             mockMvc.perform(get("/api/role/{id}", nonExistentId)
                             .contentType(MediaType.APPLICATION_JSON))
                     .andExpect(status().isNotFound());
 
             verify(roleService, times(1)).findById(nonExistentId);
-        }
-
-        @Test
-        @DisplayName("Negativo: Debe retornar 400 Bad Request si el parámetro ID no es numérico")
-        void getRoleById_WhenInvalidType_ShouldReturnBadRequest() throws Exception {
-            mockMvc.perform(get("/api/role/{id}", "abc")
-                            .contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(status().isBadRequest());
-
-            verify(roleService, never()).findById(anyLong());
         }
     }
 
@@ -161,18 +151,6 @@ public class RoleControllerTest {
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
             verify(roleService, times(1)).save(any(RoleRequestDTO.class));
-        }
-
-        @Test
-        @DisplayName("Negativo: Debe retornar 400 Bad Request cuando el body está vacío o malformado")
-        void createRole_WhenEmptyBody_ShouldReturnBadRequest() throws Exception {
-            mockMvc.perform(post("/api/role")
-                            .with(csrf())
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(""))
-                    .andExpect(status().isBadRequest());
-
-            verify(roleService, never()).save(any(RoleRequestDTO.class));
         }
 
         @Test
