@@ -3,7 +3,10 @@ package com.auth.service.auth_service.controller;
 import com.auth.service.auth_service.dto.RoleRequestDTO;
 import com.auth.service.auth_service.dto.RoleResponseDTO;
 import com.auth.service.auth_service.exception.ResourceNotFoundException;
+import com.auth.service.auth_service.security.config.SecurityConfig;
 import com.auth.service.auth_service.service.IRoleService;
+import com.auth.service.auth_service.service.UserDetailsServiceImpl;
+import com.auth.service.auth_service.utils.JwtUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,7 +14,9 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -21,6 +26,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
@@ -29,6 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @WebMvcTest(RoleController.class)
+@Import(SecurityConfig.class)
 @WithMockUser(username = "admin", roles = {"ADMIN"})
 public class RoleControllerTest {
 
@@ -40,6 +47,12 @@ public class RoleControllerTest {
 
     @MockitoBean
     private IRoleService roleService;
+
+    @MockitoBean
+    private JwtUtil jwtUtil;
+
+    @MockitoBean
+    private UserDetailsServiceImpl userDetailsService;
 
     private RoleRequestDTO validRequestDTO;
     private RoleResponseDTO sampleResponseDTO;
@@ -106,7 +119,7 @@ public class RoleControllerTest {
         @Test
         @DisplayName("Positivo: Debe retornar 200 OK y el rol cuando el ID existe")
         void getRoleById_WhenIdExists_ShouldReturnOk() throws Exception {
-            Long roleId = 1L;
+            Long roleId = 99L;
             when(roleService.findById(roleId)).thenReturn(sampleResponseDTO);
 
             mockMvc.perform(get("/api/role/{id}", roleId)
@@ -114,6 +127,7 @@ public class RoleControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
+            assertEquals(roleId,sampleResponseDTO.getId());
             verify(roleService, times(1)).findById(roleId);
         }
 
@@ -144,7 +158,6 @@ public class RoleControllerTest {
             when(roleService.save(any(RoleRequestDTO.class))).thenReturn(sampleResponseDTO);
 
             mockMvc.perform(post("/api/role")
-                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(validRequestDTO)))
                     .andExpect(status().isCreated())
@@ -154,12 +167,14 @@ public class RoleControllerTest {
         }
 
         @Test
-        @DisplayName("Negativo: Debe retornar 403 Forbidden al hacer POST sin token CSRF")
-        void createRole_WhenNoCsrf_ShouldReturnForbidden() throws Exception {
+        //@WithMockUser(username = "user", roles = {"USER"})
+        @WithAnonymousUser
+        @DisplayName("Negativo: Debe retornar 403 Forbidden al hacer POST.")
+        void createRole_ShouldReturnForbidden() throws Exception {
             mockMvc.perform(post("/api/role")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(validRequestDTO)))
-                    .andExpect(status().isForbidden());
+                    .andExpect(status().isUnauthorized());
 
             verify(roleService, never()).save(any(RoleRequestDTO.class));
         }
@@ -175,11 +190,10 @@ public class RoleControllerTest {
         @Test
         @DisplayName("Positivo: Debe retornar 200 OK y el rol actualizado cuando el ID y body son válidos")
         void updateRoleById_WhenValidRequest_ShouldReturnOk() throws Exception {
-            Long roleId = 1L;
+            Long roleId = 99L;
             when(roleService.updateById(eq(roleId), any(RoleRequestDTO.class))).thenReturn(sampleResponseDTO);
 
             mockMvc.perform(put("/api/role/{id}", roleId)
-                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(validRequestDTO)))
                     .andExpect(status().isOk())
@@ -196,7 +210,6 @@ public class RoleControllerTest {
                     .thenThrow(new ResourceNotFoundException("Role not found."));
 
             mockMvc.perform(put("/api/role/{id}", nonExistentId)
-                            .with(csrf())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(validRequestDTO)))
                     .andExpect(status().isNotFound());
@@ -219,8 +232,7 @@ public class RoleControllerTest {
             Long roleId = 1L;
             doNothing().when(roleService).deleteById(roleId);
 
-            mockMvc.perform(delete("/api/role/{id}", roleId)
-                            .with(csrf()))
+            mockMvc.perform(delete("/api/role/{id}", roleId))
                     .andExpect(status().isNoContent());
 
             verify(roleService, times(1)).deleteById(roleId);
@@ -232,8 +244,7 @@ public class RoleControllerTest {
             Long nonExistentId = 99L;
             doThrow(new ResourceNotFoundException("Id not found.")).when(roleService).deleteById(nonExistentId);
 
-            mockMvc.perform(delete("/api/role/{id}", nonExistentId)
-                            .with(csrf()))
+            mockMvc.perform(delete("/api/role/{id}", nonExistentId))
                     .andExpect(status().isNotFound());
 
             verify(roleService, times(1)).deleteById(nonExistentId);
