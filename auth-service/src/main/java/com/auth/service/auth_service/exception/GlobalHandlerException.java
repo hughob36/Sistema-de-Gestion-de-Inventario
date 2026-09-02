@@ -20,45 +20,43 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFoundException(ResourceNotFoundException ex) {
-
-        // Usamos warn porque es un error de flujo, no de código
-        log.warn("Recurso no encontrado: {}", ex.getMessage());
+        // WARN level: expected business flow exception, not an application crash
+        log.warn("Resource not found: {}", ex.getMessage());
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponseDTO);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
-        // ERROR porque hubo un problema con la persistencia
-        log.error("Violación de integridad de datos: ", ex);
+        // ERROR level: persistence/database constraint violation
+        log.error("Data integrity violation: ", ex);
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("The resource already exists or cannot be created/updated.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException ex) {
-        // Usamos warn porque es un error de flujo, no de código
-        log.warn("Recurso no encontrado: {}", ex.getMessage());
+        // WARN level: invalid authentication attempt
+        log.warn("Authentication failed - Invalid credentials: {}", ex.getMessage());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Invalid username or password.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
-        // Logueamos el intento fallido (Nivel WARN)
-        // Es útil para detectar ataques de fuerza bruta si ves muchos seguidos
-        log.warn("Intento de inicio de sesión fallido: {}", ex.getMessage());
+        // WARN level: useful for monitoring potential brute force attacks
+        log.warn("Authentication failed - Username not found: {}", ex.getMessage());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Invalid username or password.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {
-        log.error("Unexpected error: ", ex); // loggear el stacktrace completo
+        // ERROR level: log full stack trace for unhandled errors
+        log.error("Unexpected internal server error: ", ex);
         Map<String, Object> body = new HashMap<>();
         body.put("message", "An unexpected error occurred on the server.");
-        //body.put("details", ex.getMessage()); // nunca exponer detalles internos al cliente
-        body.put("details", null);
+        body.put("details", null); // never leak internal details to the client
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
@@ -68,11 +66,8 @@ public class GlobalHandlerException {
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-        // ErrorResponseDTO para devolver un mensaje general + lista de errores
+        log.warn("Validation failed for input data: {} error(s) found", errors.size());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Validation failed", errors);
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
-
-
 }

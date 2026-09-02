@@ -7,15 +7,13 @@ import com.auth.service.auth_service.mapper.IPermissionMapper;
 import com.auth.service.auth_service.model.Permission;
 import com.auth.service.auth_service.repository.IPermissionRepository;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
 @RequiredArgsConstructor
-public class PermissionService implements IPermissionService{
-
+public class PermissionService implements IPermissionService {
 
     private final IPermissionRepository permissionRepository;
     private final IPermissionMapper permissionMapper;
@@ -28,7 +26,7 @@ public class PermissionService implements IPermissionService{
     @Override
     public PermissionResponseDTO findById(Long id) {
         Permission permission = permissionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Id '"+ id +"' not found."));
+                .orElseThrow(() -> new ResourceNotFoundException("Permission with id '" + id + "' not found."));
         return permissionMapper.toPermissionResponseDTO(permission);
     }
 
@@ -40,8 +38,8 @@ public class PermissionService implements IPermissionService{
 
     @Override
     public void deleteById(Long id) {
-        if(!permissionRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Resource not exists.");
+        if (!permissionRepository.existsById(id)) {
+            throw new ResourceNotFoundException("Permission with id '" + id + "' does not exist.");
         }
         permissionRepository.deleteById(id);
     }
@@ -49,8 +47,8 @@ public class PermissionService implements IPermissionService{
     @Override
     public PermissionResponseDTO updateById(Long id, PermissionRequestDTO permissionRequestDTO) {
         Permission permissionFound = permissionRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Resource not found."));
-        permissionMapper.updatePermissionFromDto(permissionRequestDTO,permissionFound);
+                .orElseThrow(() -> new ResourceNotFoundException("Permission with id '" + id + "' not found."));
+        permissionMapper.updatePermissionFromDto(permissionRequestDTO, permissionFound);
         return permissionMapper.toPermissionResponseDTO(permissionRepository.save(permissionFound));
     }
 }

@@ -109,11 +109,11 @@ class PermissionServiceTest {
             @DisplayName("Should propagate unexpected RuntimeException when repository fails")
             void shouldPropagateExceptionWhenRepositoryFails() {
                 // Arrange
-                when(permissionRepository.findAll()).thenThrow(new RuntimeException("Database unreachable"));
+                when(permissionRepository.findAll()).thenThrow(new RuntimeException("Database connection timeout"));
 
                 // Act & Assert
                 RuntimeException ex = assertThrows(RuntimeException.class, () -> permissionService.findAll());
-                assertEquals("Database unreachable", ex.getMessage());
+                assertEquals("Database connection timeout", ex.getMessage());
 
                 verify(permissionRepository, times(1)).findAll();
                 verifyNoInteractions(permissionMapper);
@@ -176,7 +176,7 @@ class PermissionServiceTest {
                         () -> permissionService.findById(nonExistentId)
                 );
 
-                assertEquals("Id '" + nonExistentId + "' not found.", exception.getMessage());
+                assertEquals("Permission with id '" + nonExistentId + "' not found.", exception.getMessage());
                 verify(permissionRepository, times(1)).findById(nonExistentId);
                 verifyNoInteractions(permissionMapper);
             }
@@ -193,7 +193,7 @@ class PermissionServiceTest {
                         () -> permissionService.findById(null)
                 );
 
-                assertEquals("Id 'null' not found.", exception.getMessage());
+                assertEquals("Permission with id 'null' not found.", exception.getMessage());
                 verify(permissionRepository, times(1)).findById(null);
                 verifyNoInteractions(permissionMapper);
             }
@@ -254,7 +254,7 @@ class PermissionServiceTest {
 
                 when(permissionMapper.toPermission(requestDTO)).thenReturn(entity);
                 when(permissionRepository.save(entity))
-                        .thenThrow(new DataIntegrityViolationException("Unique constraint violation: duplicate permission"));
+                        .thenThrow(new DataIntegrityViolationException("Unique constraint violation: duplicate permission name"));
 
                 // Act & Assert
                 assertThrows(DataIntegrityViolationException.class, () -> permissionService.save(requestDTO));
@@ -312,7 +312,7 @@ class PermissionServiceTest {
                         () -> permissionService.deleteById(nonExistentId)
                 );
 
-                assertEquals("Resource not exists.", exception.getMessage());
+                assertEquals("Permission with id '" + nonExistentId + "' does not exist.", exception.getMessage());
                 verify(permissionRepository, times(1)).existsById(nonExistentId);
                 verify(permissionRepository, never()).deleteById(anyLong());
                 verifyNoInteractions(permissionMapper);
@@ -399,7 +399,7 @@ class PermissionServiceTest {
                         () -> permissionService.updateById(nonExistentId, requestDTO)
                 );
 
-                assertEquals("Resource not found.", exception.getMessage());
+                assertEquals("Permission with id '" + nonExistentId + "' not found.", exception.getMessage());
                 verify(permissionRepository, times(1)).findById(nonExistentId);
                 verify(permissionMapper, never()).updatePermissionFromDto(any(), any());
                 verify(permissionRepository, never()).save(any());
