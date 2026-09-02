@@ -2,7 +2,7 @@ package com.auth.service.auth_service.controller;
 
 import com.auth.service.auth_service.dto.AuthRequestDTO;
 import com.auth.service.auth_service.dto.AuthResponseDTO;
-import com.auth.service.auth_service.service.IAuthenticationService;
+import com.auth.service.auth_service.security.config.service.IAuthenticationService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;

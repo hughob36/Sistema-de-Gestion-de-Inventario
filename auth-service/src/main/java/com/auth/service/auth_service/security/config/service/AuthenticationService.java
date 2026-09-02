@@ -1,4 +1,4 @@
-package com.auth.service.auth_service.service;
+package com.auth.service.auth_service.security.config.service;
 
 import com.auth.service.auth_service.dto.AuthRequestDTO;
 import com.auth.service.auth_service.dto.AuthResponseDTO;
@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service;
 
 @Service
 @RequiredArgsConstructor
-public class AuthenticationService implements IAuthenticationService{
+public class AuthenticationService implements IAuthenticationService {
 
     private final AuthenticationManager authenticationManager;
     private final JwtUtil jwtUtil;

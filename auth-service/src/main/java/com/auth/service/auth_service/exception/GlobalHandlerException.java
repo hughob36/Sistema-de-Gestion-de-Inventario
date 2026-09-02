@@ -20,42 +20,37 @@ public class GlobalHandlerException {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleNotFoundException(ResourceNotFoundException ex) {
+
+        // Usamos warn porque es un error de flujo, no de código
+        log.warn("Recurso no encontrado: {}", ex.getMessage());
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO(ex.getMessage());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponseDTO);
     }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponseDTO> handleDataIntegrityViolationException(DataIntegrityViolationException ex) {
+        // ERROR porque hubo un problema con la persistencia
+        log.error("Violación de integridad de datos: ", ex);
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("The resource already exists or cannot be created/updated.");
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponseDTO> handleBadCredentialsException(BadCredentialsException ex) {
+        // Usamos warn porque es un error de flujo, no de código
+        log.warn("Recurso no encontrado: {}", ex.getMessage());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Invalid username or password.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 
     @ExceptionHandler(UsernameNotFoundException.class)
     public ResponseEntity<ErrorResponseDTO> handleUsernameNotFoundException(UsernameNotFoundException ex) {
+        // Logueamos el intento fallido (Nivel WARN)
+        // Es útil para detectar ataques de fuerza bruta si ves muchos seguidos
+        log.warn("Intento de inicio de sesión fallido: {}", ex.getMessage());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Invalid username or password.");
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
-
-
-    /*@ExceptionHandler(Exception.class)
-    public ResponseEntity<ErrorResponseDTO> handleGenericException(Exception ex) {
-        ErrorResponseDTO errorResponse = new ErrorResponseDTO("An unexpected error occurred on the server.");
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    @ExceptionHandler(Exception.class)
-    public ResponseEntity<?> handleException(Exception ex) {
-        Map<String, Object> body = new HashMap<>();
-        body.put("message", "An unexpected error occurred on the server.");
-        body.put("details", ex.getMessage()); // o null si querés ocultarlo
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }*/
 
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception ex) {

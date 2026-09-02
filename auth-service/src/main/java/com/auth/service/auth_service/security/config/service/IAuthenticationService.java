@@ -1,4 +1,4 @@
-package com.auth.service.auth_service.service;
+package com.auth.service.auth_service.security.config.service;
 
 
 import com.auth.service.auth_service.dto.AuthRequestDTO;
