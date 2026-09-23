@@ -19,6 +19,6 @@ ENV JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
 
 # Nota: El puerto expuesto es informativo.
 # Config Server usará 8081 y Eureka usará 8761 según sus respectivos application.yml y el docker-compose.
-EXPOSE 8081 8761
+EXPOSE 8081
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

@@ -16,10 +16,10 @@ WORKDIR /app
 # Copiamos el JAR generado en la etapa anterior
 COPY --from=build /app/target/*.jar app.jar
 
-# Configuramos variables de entorno para memoria (ajustables según necesidad)
+# Configuramos variables de entorno para memoria
 ENV JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
 
-# Puerto en el que correrá el servicio de autenticación
+# Puerto informativo general para los servicios de negocio
 EXPOSE 8080
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
