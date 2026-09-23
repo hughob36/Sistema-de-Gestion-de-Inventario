@@ -6,7 +6,7 @@ WORKDIR /app
 COPY pom.xml .
 COPY src ./src
 
-# Salteamos los tests explicitamente con true
+# Salteamos los tests explícitamente con true
 RUN mvn clean package -DskipTests=true
 
 # ETAPA 2: Runtime
@@ -17,6 +17,8 @@ COPY --from=build /app/target/*.jar app.jar
 
 ENV JAVA_TOOL_OPTIONS="-Xmx256m -Xms128m"
 
-EXPOSE 8080
+# Nota: El puerto expuesto es informativo.
+# Config Server usará 8081 y Eureka usará 8761 según sus respectivos application.yml y el docker-compose.
+EXPOSE 8081 8761
 
 ENTRYPOINT ["java", "-jar", "app.jar"]
