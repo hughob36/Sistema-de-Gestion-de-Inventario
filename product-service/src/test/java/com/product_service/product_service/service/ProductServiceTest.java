@@ -68,7 +68,6 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe retornar lista de productos con información de stock cuando existen coincidencias")
         void findAll_Success() {
-            // Arrange
             List<Product> products = List.of(product);
             List<ProductResponseDTO> dtos = List.of(productResponseDTO);
             List<StockResponseDTO> stocks = List.of(stockResponseDTO);
@@ -77,10 +76,8 @@ public class ProductServiceTest {
             when(productMapper.toProductResponseDTOList(products)).thenReturn(dtos);
             when(stockClient.findAll()).thenReturn(stocks);
 
-            // Act
             List<ProductResponseDTO> result = productService.findAll();
 
-            // Assert
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals(10, result.get(0).getStock());
@@ -93,18 +90,15 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe asignar stock 0 y status OUT_OF_STOCK cuando el stockClient falla o no encuentra el producto")
         void findAll_StockFallbackOrNotFound() {
-            // Arrange
             List<Product> products = List.of(product);
             List<ProductResponseDTO> dtos = List.of(productResponseDTO);
 
             when(productRepository.findAll()).thenReturn(products);
             when(productMapper.toProductResponseDTOList(products)).thenReturn(dtos);
-            when(stockClient.findAll()).thenReturn(Collections.emptyList()); // Simula respuesta vacía o fallback
+            when(stockClient.findAll()).thenReturn(Collections.emptyList());
 
-            // Act
             List<ProductResponseDTO> result = productService.findAll();
 
-            // Assert
             assertNotNull(result);
             assertEquals(1, result.size());
             assertEquals(0, result.get(0).getStock());
@@ -119,15 +113,13 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe retornar el producto con su stock cuando existe el ID y el stock")
         void findById_Success() {
-            // Arrange
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-            when(stockClient.findByProductId(1L)).thenReturn(Optional.of(stockResponseDTO));
+            // Corregido: stockClient.findByProductId devuelve StockResponseDTO directamente, no Optional
+            when(stockClient.findByProductId(1L)).thenReturn(stockResponseDTO);
             when(productMapper.toProductResponseDTO(product)).thenReturn(productResponseDTO);
 
-            // Act
             ProductResponseDTO result = productService.findById(1L);
 
-            // Assert
             assertNotNull(result);
             assertEquals(10, result.getStock());
             assertEquals("IN_STOCK", result.getStatus());
@@ -138,10 +130,8 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe lanzar ResourceNotFoundException cuando el producto no existe en la BD")
         void findById_ProductNotFound_ThrowsException() {
-            // Arrange
             when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-            // Act & Assert
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> productService.findById(1L)
@@ -152,19 +142,18 @@ public class ProductServiceTest {
         }
 
         @Test
-        @DisplayName("Debe lanzar ResourceNotFoundException cuando no se encuentra el stock del producto")
-        void findById_StockNotFound_ThrowsException() {
-            // Arrange
+        @DisplayName("Debe asignar stock 0 y status STOCK_UNAVAILABLE cuando no se encuentra el stock del producto")
+        void findById_StockNotFound_SetsFallback() {
+            // Corregido acorde al servicio: Si el stock es null, aplica el fallback en lugar de lanzar excepción
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
-            when(stockClient.findByProductId(1L)).thenReturn(Optional.empty());
+            when(stockClient.findByProductId(1L)).thenReturn(null);
+            when(productMapper.toProductResponseDTO(product)).thenReturn(productResponseDTO);
 
-            // Act & Assert
-            ResourceNotFoundException exception = assertThrows(
-                    ResourceNotFoundException.class,
-                    () -> productService.findById(1L)
-            );
+            ProductResponseDTO result = productService.findById(1L);
 
-            assertEquals("Resource stock not found.", exception.getMessage());
+            assertNotNull(result);
+            assertEquals(0, result.getStock());
+            assertEquals("STOCK_UNAVAILABLE", result.getStatus());
         }
     }
 
@@ -175,15 +164,12 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe guardar y retornar el nuevo producto DTO exitosamente")
         void save_Success() {
-            // Arrange
             when(productMapper.toProduct(productRequestDTO)).thenReturn(product);
             when(productRepository.save(product)).thenReturn(product);
             when(productMapper.toProductResponseDTO(product)).thenReturn(productResponseDTO);
 
-            // Act
             ProductResponseDTO result = productService.save(productRequestDTO);
 
-            // Assert
             assertNotNull(result);
             verify(productRepository).save(product);
         }
@@ -196,24 +182,19 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe eliminar el producto correctamente si el ID existe")
         void deleteById_Success() {
-            // Arrange
             when(productRepository.existsById(1L)).thenReturn(true);
             doNothing().when(productRepository).deleteById(1L);
 
-            // Act
             assertDoesNotThrow(() -> productService.deleteById(1L));
 
-            // Assert
             verify(productRepository).deleteById(1L);
         }
 
         @Test
         @DisplayName("Debe lanzar ResourceNotFoundException si se intenta eliminar un ID inexistente")
         void deleteById_NotFound_ThrowsException() {
-            // Arrange
             when(productRepository.existsById(1L)).thenReturn(false);
 
-            // Act & Assert
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> productService.deleteById(1L)
@@ -231,16 +212,13 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe actualizar y devolver el producto cuando el ID existe")
         void updateById_Success() {
-            // Arrange
             when(productRepository.findById(1L)).thenReturn(Optional.of(product));
             doNothing().when(productMapper).updateProductFromDto(productRequestDTO, product);
             when(productRepository.save(product)).thenReturn(product);
             when(productMapper.toProductResponseDTO(product)).thenReturn(productResponseDTO);
 
-            // Act
             ProductResponseDTO result = productService.updateById(1L, productRequestDTO);
 
-            // Assert
             assertNotNull(result);
             verify(productRepository).findById(1L);
             verify(productMapper).updateProductFromDto(productRequestDTO, product);
@@ -250,10 +228,8 @@ public class ProductServiceTest {
         @Test
         @DisplayName("Debe lanzar ResourceNotFoundException si se intenta actualizar un ID inexistente")
         void updateById_NotFound_ThrowsException() {
-            // Arrange
             when(productRepository.findById(1L)).thenReturn(Optional.empty());
 
-            // Act & Assert
             ResourceNotFoundException exception = assertThrows(
                     ResourceNotFoundException.class,
                     () -> productService.updateById(1L, productRequestDTO)
