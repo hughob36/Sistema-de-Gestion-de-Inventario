@@ -9,6 +9,7 @@ COPY src ./src
 # Compilamos y ejecutamos los tests automáticamente
 RUN mvn clean package
 
+
 # ETAPA 2: Runtime
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
