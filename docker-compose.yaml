@@ -74,11 +74,6 @@ services:
     networks:
       - inventory-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081/actuator/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
 
   eureka-service:
     build:
@@ -90,16 +85,10 @@ services:
     environment:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
     depends_on:
-      config-server:
-        condition: service_healthy
+      - config-server
     networks:
       - inventory-network
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8761/actuator/health"]
-      interval: 15s
-      timeout: 5s
-      retries: 10
 
   # ==========================================
   # 3. MICROSERVICIOS DE NEGOCIO
@@ -108,9 +97,7 @@ services:
     build:
       context: ./auth-service
       dockerfile: Dockerfile
-    container_name: auth-service
-    ports:
-      - "8082:0"
+    container_name: auth-service   
     environment:
       - BD_URL=jdbc:mysql://auth-db:3306/auth_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - BD_USER=root
@@ -123,7 +110,7 @@ services:
       auth-db:
         condition: service_healthy
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - inventory-network
     restart: unless-stopped
@@ -132,9 +119,7 @@ services:
     build:
       context: ./product-service
       dockerfile: Dockerfile
-    container_name: product-service
-    ports:
-      - "8083:0"
+    container_name: product-service    
     environment:
       - BD_URL=jdbc:mysql://product-db:3306/product_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - BD_USER=root
@@ -147,7 +132,7 @@ services:
       product-db:
         condition: service_healthy
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - inventory-network
     restart: unless-stopped
@@ -156,9 +141,7 @@ services:
     build:
       context: ./stock-service
       dockerfile: Dockerfile
-    container_name: stock-service
-    ports:
-      - "8084:0"
+    container_name: stock-service    
     environment:
       - BD_URL=jdbc:mysql://stock-db:3306/stock_db?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
       - BD_USER=root
@@ -171,7 +154,7 @@ services:
       stock-db:
         condition: service_healthy
       eureka-service:
-        condition: service_healthy
+        condition: service_started
     networks:
       - inventory-network
     restart: unless-stopped
@@ -190,14 +173,10 @@ services:
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8081
       - EUREKA_CLIENT_SERVICEURL_DEFAULTZONE=http://eureka-service:8761/eureka/
     depends_on:
-      eureka-service:
-        condition: service_healthy
-      auth-service:
-        condition: service_started
-      product-service:
-        condition: service_started
-      stock-service:
-        condition: service_started
+      - eureka-service
+      - auth-service
+      - product-service
+      - stock-service
     networks:
       - inventory-network
     restart: unless-stopped
