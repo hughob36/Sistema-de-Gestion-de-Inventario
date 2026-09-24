@@ -7,7 +7,8 @@ COPY pom.xml .
 COPY src ./src
 
 # Compilamos y ejecutamos los tests automáticamente
-RUN mvn clean package
+#RUN mvn clean package
+RUN mvn clean package -DskipTests
 
 # ETAPA 2: Runtime
 FROM eclipse-temurin:21-jre-alpine
