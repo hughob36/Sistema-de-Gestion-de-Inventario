@@ -6,6 +6,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -69,5 +70,12 @@ public class GlobalHandlerException {
         log.warn("Validation failed for input data: {} error(s) found", errors.size());
         ErrorResponseDTO errorResponse = new ErrorResponseDTO("Validation failed", errors);
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(AuthorizationDeniedException.class)
+    public ResponseEntity<ErrorResponseDTO> handleAuthorizationDeniedException(org.springframework.security.authorization.AuthorizationDeniedException ex) {
+        log.warn("Access denied: {}", ex.getMessage());
+        ErrorResponseDTO errorResponse = new ErrorResponseDTO("Access denied.");
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
     }
 }

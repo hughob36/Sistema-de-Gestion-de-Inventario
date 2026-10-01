@@ -13,6 +13,7 @@ import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
@@ -143,6 +144,33 @@ class GlobalHandlerExceptionTest {
                     () -> assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode(), "Status code must be 401"),
                     () -> assertNotNull(response.getBody()),
                     () -> assertEquals("Invalid username or password.", response.getBody().message()),
+                    () -> assertNull(response.getBody().details())
+            );
+        }
+    }
+
+    // =========================================================================
+    // AuthorizationDeniedException (401 UNAUTHORIZED)
+    // =========================================================================
+    @Nested
+    @DisplayName("Tests for AuthorizationDeniedException")
+    class AuthorizationDeniedExceptionTests {
+
+        @Test
+        @DisplayName("Should return 401 UNAUTHORIZED when access is denied")
+        void shouldReturnUnauthorizedWhenAccessIsDenied() {
+            // Arrange
+            AuthorizationDeniedException ex = new AuthorizationDeniedException("Access Denied");
+
+            // Act
+            ResponseEntity<ErrorResponseDTO> response = exceptionHandler.handleAuthorizationDeniedException(ex);
+
+            // Assert
+            assertAll("Verify 401 response for authorization denied",
+                    () -> assertNotNull(response),
+                    () -> assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode(), "Status code must be 401"),
+                    () -> assertNotNull(response.getBody()),
+                    () -> assertEquals("Access denied.", response.getBody().message()),
                     () -> assertNull(response.getBody().details())
             );
         }

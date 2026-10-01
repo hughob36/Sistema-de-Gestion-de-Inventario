@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.test.context.support.WithAnonymousUser;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -30,7 +29,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.*;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -59,9 +57,8 @@ public class RoleControllerTest {
 
     @BeforeEach
     void setUp() {
-        // Inicializa con datos válidos según los atributos de tus DTOs
-        validRequestDTO = new RoleRequestDTO("ADMIN",new HashSet<>());
-        sampleResponseDTO = new RoleResponseDTO(99L,"ADMIN",new HashSet<>());
+        validRequestDTO = new RoleRequestDTO("ADMIN", new HashSet<>());
+        sampleResponseDTO = new RoleResponseDTO(99L, "ADMIN", new HashSet<>());
     }
 
     // ==========================================
@@ -72,8 +69,8 @@ public class RoleControllerTest {
     class GetAllRolesTests {
 
         @Test
-        @DisplayName("Positivo: Debe retornar 200 OK y la lista con roles")
-        void getAllRole_WhenRolesExist_ShouldReturnOk() throws Exception {
+        @DisplayName("Positive: Should return 200 OK and the list of roles")
+        void getAllRoles_WhenRolesExist_ShouldReturnOk() throws Exception {
             when(roleService.findAll()).thenReturn(List.of(sampleResponseDTO));
 
             mockMvc.perform(get("/api/role")
@@ -86,8 +83,8 @@ public class RoleControllerTest {
         }
 
         @Test
-        @DisplayName("Positivo: Debe retornar 200 OK y una lista vacía cuando no hay registros")
-        void getAllRole_WhenEmpty_ShouldReturnOkEmptyList() throws Exception {
+        @DisplayName("Positive: Should return 200 OK and an empty list when no records exist")
+        void getAllRoles_WhenEmpty_ShouldReturnOkEmptyList() throws Exception {
             when(roleService.findAll()).thenReturn(Collections.emptyList());
 
             mockMvc.perform(get("/api/role")
@@ -100,8 +97,8 @@ public class RoleControllerTest {
 
         @Test
         @WithAnonymousUser
-        @DisplayName("Negativo: Debe retornar 401 Unauthorized si el usuario no está autenticado")
-        void getAllRole_WhenAnonymous_ShouldReturnUnauthorized() throws Exception {
+        @DisplayName("Negative: Should return 401 Unauthorized if the user is not authenticated")
+        void getAllRoles_WhenAnonymous_ShouldReturnUnauthorized() throws Exception {
             mockMvc.perform(get("/api/role"))
                     .andExpect(status().isUnauthorized());
 
@@ -117,7 +114,7 @@ public class RoleControllerTest {
     class GetRoleByIdTests {
 
         @Test
-        @DisplayName("Positivo: Debe retornar 200 OK y el rol cuando el ID existe")
+        @DisplayName("Positive: Should return 200 OK and the role when ID exists")
         void getRoleById_WhenIdExists_ShouldReturnOk() throws Exception {
             Long roleId = 99L;
             when(roleService.findById(roleId)).thenReturn(sampleResponseDTO);
@@ -127,12 +124,12 @@ public class RoleControllerTest {
                     .andExpect(status().isOk())
                     .andExpect(content().contentType(MediaType.APPLICATION_JSON));
 
-            assertEquals(roleId,sampleResponseDTO.getId());
+            assertEquals(roleId, sampleResponseDTO.getId());
             verify(roleService, times(1)).findById(roleId);
         }
 
         @Test
-        @DisplayName("Negativo: Debe retornar 404 Not Found cuando el ID no existe")
+        @DisplayName("Negative: Should return 404 Not Found when ID does not exist")
         void getRoleById_WhenIdNotFound_ShouldReturnNotFound() throws Exception {
             Long nonExistentId = 99L;
             when(roleService.findById(nonExistentId)).thenThrow(new ResourceNotFoundException("Role not found."));
@@ -153,7 +150,7 @@ public class RoleControllerTest {
     class CreateRoleTests {
 
         @Test
-        @DisplayName("Positivo: Debe retornar 201 Created cuando el body es válido")
+        @DisplayName("Positive: Should return 201 Created when body is valid")
         void createRole_WhenValidBody_ShouldReturnCreated() throws Exception {
             when(roleService.save(any(RoleRequestDTO.class))).thenReturn(sampleResponseDTO);
 
@@ -167,10 +164,9 @@ public class RoleControllerTest {
         }
 
         @Test
-        //@WithMockUser(username = "user", roles = {"USER"})
         @WithAnonymousUser
-        @DisplayName("Negativo: Debe retornar 403 Forbidden al hacer POST.")
-        void createRole_ShouldReturnForbidden() throws Exception {
+        @DisplayName("Negative: Should return 401 Unauthorized when making POST without authentication")
+        void createRole_WhenAnonymous_ShouldReturnUnauthorized() throws Exception {
             mockMvc.perform(post("/api/role")
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(objectMapper.writeValueAsString(validRequestDTO)))
@@ -188,7 +184,7 @@ public class RoleControllerTest {
     class UpdateRoleTests {
 
         @Test
-        @DisplayName("Positivo: Debe retornar 200 OK y el rol actualizado cuando el ID y body son válidos")
+        @DisplayName("Positive: Should return 200 OK and updated role when ID and body are valid")
         void updateRoleById_WhenValidRequest_ShouldReturnOk() throws Exception {
             Long roleId = 99L;
             when(roleService.updateById(eq(roleId), any(RoleRequestDTO.class))).thenReturn(sampleResponseDTO);
@@ -203,7 +199,7 @@ public class RoleControllerTest {
         }
 
         @Test
-        @DisplayName("Negativo: Debe retornar 404 Not Found cuando el ID a actualizar no existe")
+        @DisplayName("Negative: Should return 404 Not Found when ID to update does not exist")
         void updateRoleById_WhenIdNotFound_ShouldReturnNotFound() throws Exception {
             Long nonExistentId = 99L;
             when(roleService.updateById(eq(nonExistentId), any(RoleRequestDTO.class)))
@@ -216,7 +212,6 @@ public class RoleControllerTest {
 
             verify(roleService, times(1)).updateById(eq(nonExistentId), any(RoleRequestDTO.class));
         }
-
     }
 
     // ==========================================
@@ -227,7 +222,7 @@ public class RoleControllerTest {
     class DeleteRoleTests {
 
         @Test
-        @DisplayName("Positivo: Debe retornar 204 No Content cuando se elimina correctamente")
+        @DisplayName("Positive: Should return 204 No Content when deleted successfully")
         void deleteRoleById_WhenIdExists_ShouldReturnNoContent() throws Exception {
             Long roleId = 1L;
             doNothing().when(roleService).deleteById(roleId);
@@ -239,7 +234,7 @@ public class RoleControllerTest {
         }
 
         @Test
-        @DisplayName("Negativo: Debe retornar 404 Not Found cuando el ID a eliminar no existe")
+        @DisplayName("Negative: Should return 404 Not Found when ID to delete does not exist")
         void deleteRoleById_WhenIdNotFound_ShouldReturnNotFound() throws Exception {
             Long nonExistentId = 99L;
             doThrow(new ResourceNotFoundException("Id not found.")).when(roleService).deleteById(nonExistentId);
