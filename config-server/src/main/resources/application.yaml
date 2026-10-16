@@ -9,3 +9,14 @@ spring:
         git:
           uri: https://github.com/hughob36/Sistema-de-Gestion-de-Inventario.git
           search-paths: config-data
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      show-details: always
+  metrics:
+    tags:
+      application: ${spring.application.name}
